@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gym Rep and Set Tracker</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+        color: #333;
+      }
+      .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+      h1,
+      h2 {
+        text-align: center;
+        color: #4caf50;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .form-group button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      .form-group button:hover {
+        background-color: #45a049;
+      }
+      .exercise-list {
+        margin-top: 20px;
+      }
+      .exercise-item {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+      }
+      .exercise-item header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        padding: 10px;
+        background-color: #f8f8f8;
+        border-radius: 4px;
+      }
+      .exercise-item header h3 {
+        margin: 0;
+      }
+      .exercise-item header button {
+        background: none;
+        border: none;
+        font-size: 1.2em;
+      }
+      .set-list {
+        display: none;
+        margin-top: 10px;
+      }
+      .set-list.open {
+        display: block;
+      }
+      .set-item {
+        padding: 5px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .set-item:last-child {
+        border-bottom: none;
+      }
+      .buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+      .buttons button {
+        flex: 1;
+        margin: 0 5px;
+      }
+      .exercise-controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .edit-btn {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+      }
+      .edit-btn:hover {
+        background-color: #45a049;
+      }
+      .toggle-btn {
+        background: none;
+        border: none;
+        font-size: 1.2em;
+        cursor: pointer;
+        padding: 0 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Gym Rep and Set Tracker</h1>
+
+      <div id="user-section">
+        <h2>Create User</h2>
+        <div class="form-group">
+          <button onclick="createUser()">Create User</button>
+        </div>
+        <div class="form-group">
+          <label for="userId">Select User</label>
+          <select id="userId" onchange="loadWorkouts()">
+            <option value="">Select User</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="workout-section" style="display: none">
+        <h2>Create Workout</h2>
+        <div class="form-group">
+          <button onclick="createWorkout()">Create Workout</button>
+        </div>
+        <div class="form-group">
+          <label for="workoutId">Select Workout</label>
+          <select id="workoutId" onchange="loadCurrentWorkout()">
+            <option value="">Select Workout</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="current-workout-section" style="display: none">
+        <h2>Current Workout</h2>
+        <div id="current-workout-list" class="exercise-list"></div>
+        <div class="buttons">
+          <button onclick="finishWorkout()">Finish Workout</button>
+          <button onclick="showAddExercisePage()">Add Exercise</button>
+        </div>
+      </div>
+
+      <div id="add-exercise-section" style="display: none">
+        <h2>Add Exercise</h2>
+        <div class="form-group">
+          <label for="exerciseSearch">Search for an exercise</label>
+          <input
+            type="text"
+            id="exerciseSearch"
+            oninput="filterExercises()"
+            placeholder="Search for an exercise"
+          />
+        </div>
+        <div class="form-group">
+          <label for="exerciseId">Select Exercise</label>
+          <select id="exerciseId" size="5" onchange="updateExerciseSearch()">
+            <option value="">Select Exercise</option>
+          </select>
+        </div>
+        <div class="buttons">
+          <button onclick="addExerciseToWorkout()">Add Exercise</button>
+        </div>
+      </div>
+
+      <div id="add-set-section" style="display: none">
+        <h2>Add Set</h2>
+        <input type="hidden" id="workoutExerciseId" />
+        <div class="form-group">
+          <label for="setNumber">Set Number</label>
+          <input type="number" id="setNumber" placeholder="Set Number" />
+        </div>
+        <div class="form-group">
+          <label for="reps">Reps</label>
+          <input type="number" id="reps" placeholder="Reps" />
+        </div>
+        <div class="form-group">
+          <label for="weight">Weight</label>
+          <input type="number" id="weight" placeholder="Weight" />
+        </div>
+        <div class="buttons">
+          <button onclick="addSetToWorkoutExercise()">Add Set</button>
+          <button onclick="finishAddingSets()">Finish Exercise</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6"></script>
+    <script>
+      const apiBaseUrl = "https://my-worker.george-manthorp.workers.dev";
+      let exercises = [];
+      let fuse;
+      let lastCreatedWorkoutId = null;
+      let currentWorkoutId = null;
+
+      async function createUser() {
+        const userName = prompt("Enter user name:");
+        if (!userName) return;
+
+        try {
+          const response = await fetch(`${apiBaseUrl}/users`, {
+            method: "POST",
+            body: JSON.stringify({ name: userName }),
+          });
+
+          if (response.ok) {
+            alert("User created successfully!");
+            loadUsers();
+          } else {
+            alert("Error: " + (await response.text()));
+          }
+        } catch (error) {
+          alert("Network error: " + error.message);
+        }
+      }
+
+      async function loadUsers() {
+        try {
+          const response = await fetch(`${apiBaseUrl}/users`);
+          const users = await response.json();
+          const userIdSelect = document.getElementById("userId");
+          userIdSelect.innerHTML = '<option value="">Select User</option>';
+          users.forEach((user) => {
+            const option = document.createElement("option");
+            option.value = user.user_id;
+            option.textContent = user.name;
+            userIdSelect.appendChild(option);
+          });
+        } catch (error) {
+          alert("Error loading users: " + error.message);
+        }
+      }
+
+      async function createWorkout() {
+        const userId = document.getElementById("userId").value;
+        if (!userId) {
+          alert("Please select a user");
+          return;
+        }
+
+        try {
+          const response = await fetch(`${apiBaseUrl}/workouts`, {
+            method: "POST",
+            body: JSON.stringify({ user_id: userId }),
+          });
+
+          if (response.ok) {
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+              const workout = await response.json();
+              lastCreatedWorkoutId = workout.workout_id;
+            } else {
+              const text = await response.text();
+              console.log("Non-JSON response:", text);
+            }
+            alert("Workout created successfully!");
+            loadWorkouts();
+          } else {
+            const errorText = await response.text();
+            alert("Error: " + errorText);
+          }
+        } catch (error) {
+          alert("Network error: " + error.message);
+          console.error("Full error:", error);
+        }
+      }
+
+      async function loadWorkouts() {
+        const userId = document.getElementById("userId").value;
+        if (!userId) return;
+
+        try {
+          const response = await fetch(
+            `${apiBaseUrl}/workouts?user_id=${userId}`
+          );
+          const workouts = await response.json();
+          const workoutIdSelect = document.getElementById("workoutId");
+          workoutIdSelect.innerHTML =
+            '<option value="">Select Workout</option>';
+          workouts.forEach((workout) => {
+            const option = document.createElement("option");
+            option.value = workout.workout_id;
+            option.textContent = `Workout ${workout.workout_id} - ${new Date(
+              workout.workout_date
+            ).toLocaleString()}`;
+            workoutIdSelect.appendChild(option);
+          });
+
+          if (lastCreatedWorkoutId) {
+            workoutIdSelect.value = lastCreatedWorkoutId;
+            loadCurrentWorkout();
+          }
+
+          // Add this line to show the workout section when a user is selected
+          document.getElementById("workout-section").style.display = "block";
+        } catch (error) {
+          alert("Error loading workouts: " + error.message);
+        }
+      }
+
+      async function loadCurrentWorkout() {
+        currentWorkoutId = document.getElementById("workoutId").value;
+        if (!currentWorkoutId) {
+          alert("Please select a workout first");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `${apiBaseUrl}/workout-exercises?workout_id=${currentWorkoutId}`
+          );
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const workoutExercises = await response.json();
+          const currentWorkoutList = document.getElementById(
+            "current-workout-list"
+          );
+          currentWorkoutList.innerHTML = "";
+
+          workoutExercises.forEach((we) => {
+            const exerciseItem = document.createElement("div");
+            exerciseItem.classList.add("exercise-item");
+            exerciseItem.dataset.workoutExerciseId = we.workout_exercise_id; // Store the ID
+
+            const exerciseHeader = document.createElement("header");
+            exerciseHeader.innerHTML = `
+              <h3>${we.exercise_name} - ${we.sets?.length || 0} sets</h3>
+              <div class="exercise-controls">
+                <button onclick="editExercise('${we.workout_exercise_id}', '${
+              we.exercise_name
+            }')" class="edit-btn">Edit</button>
+                <button onclick="toggleSetList(this)" class="toggle-btn">▼</button>
+              </div>
+            `;
+            exerciseHeader.addEventListener("click", () =>
+              toggleSetList(exerciseHeader)
+            );
+            exerciseItem.appendChild(exerciseHeader);
+
+            const setList = document.createElement("div");
+            setList.classList.add("set-list");
+
+            if (we.sets && we.sets.length > 0) {
+              we.sets.forEach((set) => {
+                const setItem = document.createElement("div");
+                setItem.classList.add("set-item");
+                setItem.textContent = `Set ${set.set_number}, Reps ${set.reps}, Weight ${set.weight}kg`;
+                setList.appendChild(setItem);
+              });
+            } else {
+              const noSetsMsg = document.createElement("div");
+              noSetsMsg.classList.add("set-item");
+              noSetsMsg.textContent = "No sets added yet";
+              setList.appendChild(noSetsMsg);
+            }
+
+            exerciseItem.appendChild(setList);
+            currentWorkoutList.appendChild(exerciseItem);
+          });
+
+          // Update hidden workout exercise ID for adding sets
+          if (workoutExercises.length > 0) {
+            const latestExercise =
+              workoutExercises[workoutExercises.length - 1];
+            document.getElementById("workoutExerciseId").value =
+              latestExercise.workout_exercise_id;
+          }
+
+          document.getElementById("workout-section").style.display = "none";
+          document.getElementById("current-workout-section").style.display =
+            "block";
+        } catch (error) {
+          console.error("Error loading current workout:", error);
+          alert(
+            `Error loading current workout: ${error.message}\nPlease try again or contact support if the problem persists.`
+          );
+        }
+      }
+
+      function toggleSetList(header) {
+        const setList = header.nextElementSibling;
+        setList.classList.toggle("open");
+        header.querySelector("button").textContent = setList.classList.contains(
+          "open"
+        )
+          ? "▲"
+          : "▼";
+      }
+
+      async function loadExercises() {
+        try {
+          const response = await fetch(`${apiBaseUrl}/exercises`);
+          exercises = await response.json();
+
+          fuse = new Fuse(exercises, {
+            keys: ["exercise_name"],
+            threshold: 0.3,
+          });
+
+          filterExercises();
+        } catch (error) {
+          alert("Error loading exercises: " + error.message);
+        }
+      }
+
+      function filterExercises() {
+        const searchTerm = document.getElementById("exerciseSearch").value;
+        let results = [];
+
+        if (searchTerm) {
+          results = fuse.search(searchTerm).map((result) => result.item);
+        } else {
+          results = exercises;
+        }
+
+        const exerciseIdSelect = document.getElementById("exerciseId");
+        exerciseIdSelect.innerHTML =
+          '<option value="">Select Exercise</option>';
+        results.forEach((exercise) => {
+          const option = document.createElement("option");
+          option.value = exercise.exercise_id;
+          option.textContent = exercise.exercise_name;
+          exerciseIdSelect.appendChild(option);
+        });
+      }
+
+      function updateExerciseSearch() {
+        const exerciseIdSelect = document.getElementById("exerciseId");
+        const selectedExercise = exercises.find(
+          (exercise) =>
+            exercise.exercise_id === parseInt(exerciseIdSelect.value)
+        );
+        if (selectedExercise) {
+          document.getElementById("exerciseSearch").value =
+            selectedExercise.exercise_name;
+        }
+      }
+
+      async function addExerciseToWorkout() {
+        const workoutId = document.getElementById("workoutId").value;
+        const exerciseId = document.getElementById("exerciseId").value;
+
+        if (!workoutId || !exerciseId) {
+          alert("Please select a workout and an exercise");
+          return;
+        }
+
+        try {
+          const response = await fetch(`${apiBaseUrl}/workout-exercises`, {
+            method: "POST",
+            body: JSON.stringify({
+              workout_id: workoutId,
+              exercise_id: exerciseId,
+              exercise_order: 0, // Backend will handle ordering
+              notes: "", // Empty string for notes
+            }),
+          });
+
+          if (response.ok) {
+            alert("Exercise added to workout successfully!");
+            loadCurrentWorkout();
+            showAddSetPage();
+          } else {
+            alert("Error: " + (await response.text()));
+          }
+        } catch (error) {
+          alert("Network error: " + error.message);
+        }
+      }
+
+      function showAddExercisePage() {
+        document.getElementById("current-workout-section").style.display =
+          "none";
+        document.getElementById("add-exercise-section").style.display = "block";
+        loadExercises();
+      }
+
+      function showAddSetPage() {
+        document.getElementById("add-exercise-section").style.display = "none";
+        document.getElementById("add-set-section").style.display = "block";
+      }
+
+      async function addSetToWorkoutExercise() {
+        const workoutExerciseId =
+          document.getElementById("workoutExerciseId").value;
+        const setNumber = document.getElementById("setNumber").value;
+        const reps = document.getElementById("reps").value;
+        const weight = document.getElementById("weight").value;
+
+        if (!workoutExerciseId || !setNumber || !reps || !weight) {
+          alert("Please fill in all fields");
+          return;
+        }
+
+        try {
+          const response = await fetch(`${apiBaseUrl}/sets`, {
+            method: "POST",
+            body: JSON.stringify({
+              workout_exercise_id: workoutExerciseId,
+              set_number: setNumber,
+              reps,
+              weight,
+            }),
+          });
+
+          if (response.ok) {
+            alert("Set added to workout exercise successfully!");
+            loadCurrentWorkout();
+          } else {
+            alert("Error: " + (await response.text()));
+          }
+        } catch (error) {
+          alert("Network error: " + error.message);
+        }
+      }
+
+      function finishAddingSets() {
+        // Hide the add set section
+        document.getElementById("add-set-section").style.display = "none";
+
+        // Reset the add set section header back to default
+        document.querySelector("#add-set-section h2").textContent = "Add Set";
+
+        // Clear the form fields
+        document.getElementById("setNumber").value = "";
+        document.getElementById("reps").value = "";
+        document.getElementById("weight").value = "";
+
+        // Show the current workout section
+        document.getElementById("current-workout-section").style.display =
+          "block";
+      }
+
+      function finishWorkout() {
+        alert("Workout finished!");
+        document.getElementById("current-workout-section").style.display =
+          "none";
+        document.getElementById("workout-section").style.display = "block";
+      }
+
+      function editExercise(workoutExerciseId, exerciseName) {
+        document.getElementById("workoutExerciseId").value = workoutExerciseId;
+        document.getElementById("current-workout-section").style.display =
+          "none";
+        document.getElementById("add-set-section").style.display = "block";
+
+        // Update the header to show which exercise is being edited
+        document.querySelector(
+          "#add-set-section h2"
+        ).textContent = `Add Set to ${exerciseName}`;
+      }
+
+      // Load initial data
+      loadUsers();
+      loadExercises();
+    </script>
+  </body>
+</html>
