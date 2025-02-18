@@ -221,7 +221,7 @@
         console.log("Debug - Stored credentials:", { token, username });
 
         if (!token || !username) {
-          window.location.href = "./login.html";
+          window.location.href = "./index.html";
           return;
         }
 
@@ -267,7 +267,7 @@
         //alert("Logging out - clearing storage");
         localStorage.removeItem("sessionToken");
         localStorage.removeItem("username");
-        window.location.href = "./login.html";
+        window.location.href = "./index.html";
       }
 
       // Only verify session once when page loads
