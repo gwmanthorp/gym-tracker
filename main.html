@@ -258,13 +258,13 @@
           }
         } catch (error) {
           console.error("Verification failed:", error);
-          alert(`Error during verification: ${error.message}`);
+          console.log(`Error during verification: ${error.message}`);
           logout();
         }
       }
 
       function logout() {
-        //alert("Logging out - clearing storage");
+        //console.log("Logging out - clearing storage");
         localStorage.removeItem("sessionToken");
         localStorage.removeItem("username");
         window.location.href = "./index.html";
@@ -293,13 +293,13 @@
           });
 
           if (response.ok) {
-            alert("User created successfully!");
+            console.log("User created successfully!");
             loadUsers();
           } else {
-            alert("Error: " + (await response.text()));
+            console.log("Error: " + (await response.text()));
           }
         } catch (error) {
-          alert("Network error: " + error.message);
+          console.log("Network error: " + error.message);
         }
       }
 
@@ -316,14 +316,14 @@
             userIdSelect.appendChild(option);
           });
         } catch (error) {
-          alert("Error loading users: " + error.message);
+          console.log("Error loading users: " + error.message);
         }
       }
 
       async function createWorkout() {
         const userId = document.getElementById("userId").value;
         if (!userId) {
-          alert("Please select a user");
+          console.log("Please select a user");
           return;
         }
 
@@ -342,14 +342,14 @@
               const text = await response.text();
               console.log("Non-JSON response:", text);
             }
-            alert("Workout created successfully!");
+            console.log("Workout created successfully!");
             loadWorkouts();
           } else {
             const errorText = await response.text();
-            alert("Error: " + errorText);
+            console.log("Error: " + errorText);
           }
         } catch (error) {
-          alert("Network error: " + error.message);
+          console.log("Network error: " + error.message);
           console.error("Full error:", error);
         }
       }
@@ -383,14 +383,14 @@
           // Add this line to show the workout section when a user is selected
           document.getElementById("workout-section").style.display = "block";
         } catch (error) {
-          alert("Error loading workouts: " + error.message);
+          console.log("Error loading workouts: " + error.message);
         }
       }
 
       async function loadCurrentWorkout() {
         currentWorkoutId = document.getElementById("workoutId").value;
         if (!currentWorkoutId) {
-          alert("Please select a workout first");
+          console.log("Please select a workout first");
           return;
         }
 
@@ -463,7 +463,7 @@
             "block";
         } catch (error) {
           console.error("Error loading current workout:", error);
-          alert(
+          console.log(
             `Error loading current workout: ${error.message}\nPlease try again or contact support if the problem persists.`
           );
         }
@@ -491,7 +491,7 @@
 
           filterExercises();
         } catch (error) {
-          alert("Error loading exercises: " + error.message);
+          console.log("Error loading exercises: " + error.message);
         }
       }
 
@@ -533,7 +533,7 @@
         const exerciseId = document.getElementById("exerciseId").value;
 
         if (!workoutId || !exerciseId) {
-          alert("Please select a workout and an exercise");
+          console.log("Please select a workout and an exercise");
           return;
         } else {
           document.getElementById("exerciseSearch").value = "";
@@ -552,13 +552,13 @@
           });
 
           if (response.ok) {
-            alert("Exercise added to workout successfully!");
+            console.log("Exercise added to workout successfully!");
             loadCurrentWorkout();
           } else {
-            alert("Error: " + (await response.text()));
+            console.log("Error: " + (await response.text()));
           }
         } catch (error) {
-          alert("Network error: " + error.message);
+          console.log("Network error: " + error.message);
         }
       }
 
@@ -583,7 +583,7 @@
         const weight = document.getElementById("weight").value;
 
         if (!workoutExerciseId || !setNumber || !reps || !weight) {
-          alert("Please fill in all fields");
+          console.log("Please fill in all fields");
           return;
         }
 
@@ -599,13 +599,13 @@
           });
 
           if (response.ok) {
-            alert("Set added to workout exercise successfully!");
+            console.log("Set added to workout exercise successfully!");
             loadCurrentWorkout();
           } else {
-            alert("Error: " + (await response.text()));
+            console.log("Error: " + (await response.text()));
           }
         } catch (error) {
-          alert("Network error: " + error.message);
+          console.log("Network error: " + error.message);
         }
       }
 
@@ -627,7 +627,7 @@
       }
 
       function finishWorkout() {
-        alert("Workout finished!");
+        console.log("Workout finished!");
         document.getElementById("current-workout-section").style.display =
           "none";
         document.getElementById("workout-section").style.display = "block";
