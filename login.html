@@ -24,7 +24,7 @@
       document.addEventListener("DOMContentLoaded", () => {
         const token = localStorage.getItem("sessionToken");
         if (token) {
-          window.location.href = "./index.html";
+          window.location.href = "./main.html";
         }
       });
 
@@ -54,7 +54,7 @@
             localStorage.setItem("username", data.username);
 
             // Redirect to main page
-            window.location.href = "./index.html";
+            window.location.href = "./main.html";
           } else {
             document.getElementById("result").textContent = `Error: ${
               data.message || "Unknown error occurred"
